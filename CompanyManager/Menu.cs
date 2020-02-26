@@ -16,6 +16,7 @@ namespace CompanyManager
         private int chooseEmployee = 0;
         private double hourlyRate = 5;
         private int salary = 500;
+        private double managerSalary = 2000;
 
         private enum MenuItems
         {
@@ -139,27 +140,36 @@ namespace CompanyManager
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
 
-                        if (employee is HourlyEmployee hourlyEmployee)
-                            Console.WriteLine($"----->{hourlyEmployee.GetInfo()}");
+                        switch (employee)
+                        {
+                            case HourlyEmployee hourlyEmployee:
+                                Console.WriteLine($"----->{hourlyEmployee}");
+                                break;
+                            case SalariedEmployee salariedEmployee:
+                                Console.WriteLine($"----->{salariedEmployee}");
+                                break;
+                            case Manager manager:
+                                Console.WriteLine($"----->{manager}");
+                                break;
+                        }
 
-                        if (employee is SalariedEmployee salariedEmployee)
-                            Console.WriteLine($"----->{salariedEmployee.GetInfo()}");
-
-                        if (employee is Manager manager)
-                            Console.WriteLine($"----->{manager.GetInfo()}");
                         Console.ForegroundColor = ConsoleColor.Red;
                     }
                     else
                     {
 
-                        if (employee is HourlyEmployee hourlyEmployee)
-                            Console.WriteLine(hourlyEmployee.GetInfo());
-
-                        if (employee is SalariedEmployee salariedEmployee)
-                            Console.WriteLine(salariedEmployee.GetInfo());
-
-                        if (employee is Manager manager)
-                            Console.WriteLine(manager.GetInfo());
+                        switch (employee)
+                        {
+                            case HourlyEmployee hourlyEmployee:
+                                Console.WriteLine(hourlyEmployee);
+                                break;
+                            case SalariedEmployee salariedEmployee:
+                                Console.WriteLine(salariedEmployee);
+                                break;
+                            case Manager manager:
+                                Console.WriteLine(manager);
+                                break;
+                        }
                     }
                 }
 
@@ -247,7 +257,7 @@ namespace CompanyManager
             else if (employeeList[chooseEmployee] is HourlyEmployee || employeeList[chooseEmployee] is SalariedEmployee)
             {
                 employeeList[chooseEmployee] = new Manager(employeeList[chooseEmployee].name,
-                    employeeList[chooseEmployee].age, employeeList[chooseEmployee].salaryDate);
+                    employeeList[chooseEmployee].age, employeeList[chooseEmployee].salaryDate,managerSalary);
                 Console.WriteLine("Complete");
             }
 
@@ -290,12 +300,19 @@ namespace CompanyManager
                 hourly.ChangeHourlyRate(GetDouble());
             }
 
+            if (employeeList[chooseEmployee] is Manager manager)
+            {
+                Console.WriteLine("Write new salary for manager");
+                manager.ChangeManagerSalary(GetDouble());
+            }
+
             Console.WriteLine("Complete. Any key to return");
         }
 
         private double GetDouble()
         {
             double tempRate = default;
+
             while (!Double.TryParse(Console.ReadLine(), out tempRate))
             {
                 Console.WriteLine("Write correct");
@@ -341,7 +358,7 @@ namespace CompanyManager
                         DateTime.Now, salary));
                     break;
                 case ConsoleKey.D3:
-                    employeeList.Add(new Manager(Guid.NewGuid().ToString(), new Random().Next(18, 60), DateTime.Now));
+                    employeeList.Add(new Manager(Guid.NewGuid().ToString(), new Random().Next(18, 60), DateTime.Now, managerSalary));
                     break;
                 default:
                     InviteEmployee();
@@ -357,19 +374,25 @@ namespace CompanyManager
             {
                 foreach (var employee in employeeList)
                 {
-                    if (employee is HourlyEmployee hourlyEmployee)
-                        Console.WriteLine(hourlyEmployee.GetInfo());
-
-                    if (employee is SalariedEmployee salariedEmployee)
-                        Console.WriteLine(salariedEmployee.GetInfo());
+                    switch (employee)
+                    {
+                        case HourlyEmployee hourlyEmployee:
+                            Console.WriteLine(hourlyEmployee);
+                            break;
+                        case SalariedEmployee salariedEmployee:
+                            Console.WriteLine(salariedEmployee);
+                            break;
+                    }
                 }
 
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("Bosses:");
+                Console.ForegroundColor = ConsoleColor.Red;
 
                 foreach (var employee in employeeList)
                 {
                     if (employee is Manager)
-                        Console.WriteLine(((Manager) employee).GetInfo());
+                        Console.WriteLine(((Manager)employee));
                 }
 
                 Console.ReadKey();
@@ -377,6 +400,7 @@ namespace CompanyManager
             else
             {
                 Console.WriteLine("No one employee");
+                Console.ReadKey();
             }
         }
     }
