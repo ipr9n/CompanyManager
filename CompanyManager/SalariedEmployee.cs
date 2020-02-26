@@ -6,8 +6,10 @@ namespace CompanyManager
 {
     class SalariedEmployee : Employee
     {
-        private int salary = default;
-        public SalariedEmployee(string name, int age, DateTime date, int salary) : base(name, age, date)
+        private double salary = default;
+
+        public void ChangeSalary(double salary) => this.salary = salary;
+        public SalariedEmployee(string name, int age, DateTime date, double salary) : base(name, age, date)
         {
             this.salary = salary;
         }

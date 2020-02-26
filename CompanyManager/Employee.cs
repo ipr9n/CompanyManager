@@ -6,9 +6,9 @@ namespace CompanyManager
 {
     abstract class Employee
     {
-        protected string name { get; set; }
-        protected int age { get; set; }
-        protected DateTime salaryDate { get; set; }
+        public string name { get; private set; }
+        public int age { get; private set; }
+        public DateTime salaryDate { get; private set; }
 
         public Employee(string name, int age, DateTime date)
         {

@@ -51,6 +51,7 @@ namespace CompanyManager
                     Console.WriteLine($"\t{_mainMenuItems[menuItem]}");
                 }
             }
+
             CheckKey();
         }
 
@@ -71,12 +72,13 @@ namespace CompanyManager
                     MenuAction(_chooseItem);
                     break;
             }
+
             CheckKey();
         }
 
         private void MakeChoise(ConsoleKey key)
         {
-            if ((int)_chooseItem < _mainMenuItems.Count - 1 && key == ConsoleKey.DownArrow)
+            if ((int) _chooseItem < _mainMenuItems.Count - 1 && key == ConsoleKey.DownArrow)
             {
                 _chooseItem++;
                 ShowMenu();
@@ -105,6 +107,7 @@ namespace CompanyManager
                     SetHourRate();
                     break;
             }
+
             ShowMenu();
         }
 
@@ -126,39 +129,55 @@ namespace CompanyManager
         {
             Console.Clear();
 
-            for (var employeeIndex = 0; employeeIndex < employeeList.Count; employeeIndex++)
+            if (employeeList.Count > 0)
             {
-                var employee = employeeList[employeeIndex];
-
-                if (chooseEmployee == employeeIndex)
+                for (var employeeIndex = 0; employeeIndex < employeeList.Count; employeeIndex++)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    var employee = employeeList[employeeIndex];
 
-                    if (employee is HourlyEmployee hourlyEmployee)
-                        Console.WriteLine($"----->{hourlyEmployee.GetInfo()}");
+                    if (chooseEmployee == employeeIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
 
-                    if (employee is SalariedEmployee salariedEmployee)
-                        Console.WriteLine($"----->{salariedEmployee.GetInfo()}");
+                        if (employee is HourlyEmployee hourlyEmployee)
+                            Console.WriteLine($"----->{hourlyEmployee.GetInfo()}");
 
-                    if (employee is Manager manager)
-                        Console.WriteLine($"----->{manager.GetInfo()}");
-                    Console.ForegroundColor = ConsoleColor.Red;
+                        if (employee is SalariedEmployee salariedEmployee)
+                            Console.WriteLine($"----->{salariedEmployee.GetInfo()}");
+
+                        if (employee is Manager manager)
+                            Console.WriteLine($"----->{manager.GetInfo()}");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else
+                    {
+
+                        if (employee is HourlyEmployee hourlyEmployee)
+                            Console.WriteLine(hourlyEmployee.GetInfo());
+
+                        if (employee is SalariedEmployee salariedEmployee)
+                            Console.WriteLine(salariedEmployee.GetInfo());
+
+                        if (employee is Manager manager)
+                            Console.WriteLine(manager.GetInfo());
+                    }
                 }
-                else
-                {
 
-                    if (employee is HourlyEmployee hourlyEmployee)
-                        Console.WriteLine(hourlyEmployee.GetInfo());
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\t1) Change hourly rate or salary ( Hourly/salary employee)\n\t" +
+                                  "2) Change this employee to salary\n\t" +
+                                  "3) Change this employee to hourlyEmployee\n\t" +
+                                  "4) Change this employee to manager\n\t" +
+                                  "5) Uninvite this employee");
+                Console.ForegroundColor = ConsoleColor.Red;
 
-                    if (employee is SalariedEmployee salariedEmployee)
-                        Console.WriteLine(salariedEmployee.GetInfo());
-
-                    if (employee is Manager manager)
-                        Console.WriteLine(manager.GetInfo());
-                }
+                CheckEmployeeKey();
             }
-
-            CheckEmployeeKey();
+            else
+            {
+                Console.WriteLine("No one employee");
+                Console.ReadKey();
+            }
         }
 
         private void CheckEmployeeKey()
@@ -172,7 +191,119 @@ namespace CompanyManager
                 case ConsoleKey.UpArrow:
                     MakeEmployeeChoise(ConsoleKey.UpArrow);
                     break;
+
+                case ConsoleKey.D1:
+                    ChangeRate();
+                    ShowEmployeeMenu();
+                    break;
+                case ConsoleKey.D2:
+                    ChangeToSalary();
+                    ShowEmployeeMenu();
+                    break;
+                case ConsoleKey.D3:
+                    ChangeToHourly();
+                    ShowEmployeeMenu();
+                    break;
+                case ConsoleKey.D4:
+                    ChangeToManager();
+                    ShowEmployeeMenu();
+                    break;
+                case ConsoleKey.D5:
+                    employeeList.RemoveAt(chooseEmployee);
+                    chooseEmployee = 0;
+                    ShowEmployeeMenu();
+                    break;
             }
+        }
+
+        private void ChangeToSalary()
+        {
+            Console.Clear();
+
+            if (employeeList[chooseEmployee] is SalariedEmployee)
+            {
+                Console.WriteLine("Employee is already salary");
+            }
+
+            else if (employeeList[chooseEmployee] is HourlyEmployee || employeeList[chooseEmployee] is Manager)
+            {
+                employeeList[chooseEmployee] = new SalariedEmployee(employeeList[chooseEmployee].name,
+                    employeeList[chooseEmployee].age, employeeList[chooseEmployee].salaryDate, salary);
+                Console.WriteLine("Complete");
+            }
+
+            Console.ReadKey();
+        }
+
+        private void ChangeToManager()
+        {
+            Console.Clear();
+
+            if (employeeList[chooseEmployee] is SalariedEmployee)
+            {
+                Console.WriteLine("Employee is already manager");
+            }
+
+            else if (employeeList[chooseEmployee] is HourlyEmployee || employeeList[chooseEmployee] is SalariedEmployee)
+            {
+                employeeList[chooseEmployee] = new Manager(employeeList[chooseEmployee].name,
+                    employeeList[chooseEmployee].age, employeeList[chooseEmployee].salaryDate);
+                Console.WriteLine("Complete");
+            }
+
+            Console.ReadKey();
+        }
+
+        private void ChangeToHourly()
+        {
+            Console.Clear();
+
+            if (employeeList[chooseEmployee] is HourlyEmployee)
+            {
+                Console.WriteLine("Employee is already hourly");
+            }
+
+            else if (employeeList[chooseEmployee] is SalariedEmployee || employeeList[chooseEmployee] is Manager)
+            {
+                employeeList[chooseEmployee] = new HourlyEmployee(employeeList[chooseEmployee].name,
+                    employeeList[chooseEmployee].age, employeeList[chooseEmployee].salaryDate, salary);
+                Console.WriteLine("Complete");
+            }
+
+            Console.ReadKey();
+        }
+
+        private void ChangeRate()
+        {
+            Console.Clear();
+
+            if (employeeList[chooseEmployee] is SalariedEmployee salaried)
+            {
+                Console.WriteLine("Write new salary for this employee");
+
+                salaried.ChangeSalary(GetDouble());
+            }
+
+            if (employeeList[chooseEmployee] is HourlyEmployee hourly)
+            {
+                Console.WriteLine("Write new hourly rate for this employee");
+                hourly.ChangeHourlyRate(GetDouble());
+            }
+
+            Console.WriteLine("Complete. Any key to return");
+        }
+
+        private double GetDouble()
+        {
+            double tempRate = default;
+            while (!Double.TryParse(Console.ReadLine(), out tempRate))
+            {
+                Console.WriteLine("Write correct");
+            }
+
+            hourlyRate = tempRate;
+
+            return tempRate;
         }
 
         private void MakeEmployeeChoise(ConsoleKey key)
@@ -202,10 +333,12 @@ namespace CompanyManager
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.D1:
-                    employeeList.Add(new HourlyEmployee(Guid.NewGuid().ToString(), new Random().Next(18, 60), DateTime.Now, hourlyRate));
+                    employeeList.Add(new HourlyEmployee(Guid.NewGuid().ToString(), new Random().Next(18, 60),
+                        DateTime.Now, hourlyRate));
                     break;
                 case ConsoleKey.D2:
-                    employeeList.Add(new SalariedEmployee(Guid.NewGuid().ToString(), new Random().Next(18, 60), DateTime.Now, salary));
+                    employeeList.Add(new SalariedEmployee(Guid.NewGuid().ToString(), new Random().Next(18, 60),
+                        DateTime.Now, salary));
                     break;
                 case ConsoleKey.D3:
                     employeeList.Add(new Manager(Guid.NewGuid().ToString(), new Random().Next(18, 60), DateTime.Now));
@@ -220,24 +353,31 @@ namespace CompanyManager
         {
             Console.Clear();
 
-            foreach (var employee in employeeList)
+            if (employeeList.Count > 0)
             {
-                if (employee is HourlyEmployee hourlyEmployee)
-                    Console.WriteLine(hourlyEmployee.GetInfo());
+                foreach (var employee in employeeList)
+                {
+                    if (employee is HourlyEmployee hourlyEmployee)
+                        Console.WriteLine(hourlyEmployee.GetInfo());
 
-                if (employee is SalariedEmployee salariedEmployee)
-                    Console.WriteLine(salariedEmployee.GetInfo());
+                    if (employee is SalariedEmployee salariedEmployee)
+                        Console.WriteLine(salariedEmployee.GetInfo());
+                }
+
+                Console.WriteLine("Bosses:");
+
+                foreach (var employee in employeeList)
+                {
+                    if (employee is Manager)
+                        Console.WriteLine(((Manager) employee).GetInfo());
+                }
+
+                Console.ReadKey();
             }
-
-            Console.WriteLine("Bosses:");
-
-            foreach (var employee in employeeList)
+            else
             {
-                if (employee is Manager)
-                    Console.WriteLine(((Manager)employee).GetInfo());
+                Console.WriteLine("No one employee");
             }
-
-            Console.ReadKey();
         }
     }
 }
